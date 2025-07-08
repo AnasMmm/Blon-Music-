@@ -1,0 +1,23 @@
+name: Build APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm install
+      - run: npm run build
+      - run: npm install @capacitor/core @capacitor/cli
+      - run: npx cap init --yes
+      - run: npm install @capacitor/android
+      - run: npx cap add android
+      - run: cd android && ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
